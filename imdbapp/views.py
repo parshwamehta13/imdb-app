@@ -7,7 +7,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from imdb import IMDb
 import json
-
+from django.shortcuts import render
 
 
 def movie_search (request, search_movie):
@@ -17,8 +17,8 @@ def movie_search (request, search_movie):
 	movie_info = []
 	for i in movie_list:
 		movie_info.append({'id':i.getID(),'name':i['title'],'kind':i['kind']})
-	#print type(mofull_person = ia.get_person(actor[0].getID(), info=["filmography"])vie_info)
-	return HttpResponse(movie_info)
+	print movie_list
+	return render(request, 'imdbapp/moviesearch.html', {'movie_list':movie_info})
 
 def actor_search (request, actor):
 	ia = IMDb()
@@ -27,7 +27,8 @@ def actor_search (request, actor):
 	for i in actor_list:
 		actor_info.append({'id':i.getID(),'name':i['name']})
 	print type(actor_info)
-	return HttpResponse(actor_info)
+	return render(request, 'imdbapp/actorsearch.html', {'actor_info':actor_info})
+
 
 def actor_specific (request,actor_id):
 	ia = IMDb()
