@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+	{% load static %}
 	<title>IMDB Search Movies</title>
+	<link href="https://fonts.googleapis.com/css?family=Kumar+One" rel="stylesheet">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
 <!-- Optional theme -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="{% static 'imdbapp/stylesheet.css' %}">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
@@ -21,20 +24,15 @@
 	        <span class="icon-bar"></span>
 	        <span class="icon-bar"></span>
 	      </button>
-	      <a class="navbar-brand" href="#">IMDB Catalogue</a>
+	      <a class="navbar-brand" href="{% url 'homepage' %}">IMDB Catalogue</a>
 	    </div>
 
 	    <!-- Collect the nav links, forms, and other content for toggling -->
 	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-	      <ul class="nav navbar-nav">
-	        <li class="active"><a  href="#">MOVIES <span class="sr-only">(current)</span></a></li>
-	        <li><a href="#">ACTORS</a></li>
-	        
-	      </ul>
 	      <form class="navbar-form navbar-left" method="GET" action="{% url 'search_box' %}">
 	      	<div class="form-group">
 	         	<select class="form-control" name="attr">
-					<option value="movies">Movies</option>
+					<option value="movies" selected>Movies</option>
 					<option value="actor">Actor</option>					  
 				</select>
 	        </div>
@@ -42,16 +40,17 @@
 	          <input type="text" class="form-control" placeholder="Search" name="search_term">
 	        </div>
 	        
-	        <button type="submit" class="btn btn-default">Submit</button>
+	        <button type="submit" class="btn btn-default">Search</button>
 	      </form>
 	    </div><!-- /.navbar-collapse -->
 	  </div><!-- /.container-fluid -->
 	</nav>
 	<div class="data container">
+		<h2 class="search-result-heading">Search Result for "<b>{{search_term}}</b>":</h2>
 		<div class="movielist">
-			<ul class="list-group">
+			
 			{% for movie in movie_list %}
-				<li><a href="{% url 'movie' movie.id %}"> <b>{{ movie.name }}</b></a> (ID - {{ movie.id }}) Type: {{ movie.kind }}</li>
+				<div class="well"><a href="{% url 'movie' movie.id %}"> <b>{{ movie.name }}</b></a> (ID - {{ movie.id }}) <b>Type</b>: {{ movie.kind }}</div>
 			{% endfor %}
 			</ul>
 		</div>

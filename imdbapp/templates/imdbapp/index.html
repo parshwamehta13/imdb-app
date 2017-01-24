@@ -1,58 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>IMDB Search Movies</title>
+	{% load static %}
+	<title>IMDB Catalogue</title>
+	<link href="https://fonts.googleapis.com/css?family=Kumar+One" rel="stylesheet"> 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
 <!-- Optional theme -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="{% static 'imdbapp/index.css' %}">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
 </head>
 <body>
-	<nav class="navbar navbar-default">
-	  <div class="container-fluid">
-	    <!-- Brand and toggle get grouped for better mobile display -->
-	    <div class="navbar-header">
-	      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-	        <span class="sr-only">Toggle navigation</span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	      </button>
-	      <a class="navbar-brand" href="#">IMDB Catalogue</a>
-	    </div>
-
-	    <!-- Collect the nav links, forms, and other content for toggling -->
-	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-	      <ul class="nav navbar-nav">
-	        <li class="active"><a  href="#">MOVIES <span class="sr-only">(current)</span></a></li>
-	        <li><a href="#">ACTORS</a></li>
-	        
-	      </ul>
-	      <form class="navbar-form navbar-left" >
-	      	<div class="form-group">
-	         	<select class="form-control">
-					<option value="movies">Movies</option>
-					<option value="actor">Actor</option>					  
-				</select>
-	        </div>
-	        <div class="form-group">
-	          <input type="text" class="form-control" placeholder="Search" name="search_movie">
-	        </div>
-	        
-	        <button type="submit" class="btn btn-default">Submit</button>
-	      </form>
-	    </div><!-- /.navbar-collapse -->
-	  </div><!-- /.container-fluid -->
-	</nav>
-	<div class="movielist">
-		<ul class="list-group">
-		{% for movie in movie_list %}
-			<li><a href="#"> <b>{{ movie.name }}</b></a> (ID - {{ movie.id }}) Type: {{ movie.kind }}</li>
+	<div class="jumbotron">
+		<h2 class="main-heading"> IMDB Catalogue</h2>
+		<form class="search_box_index" method="GET" action="{% url 'search_box' %}">
+			<div class="row">
+				<div class="col-lg-2 col-lg-offset-3">
+			      	<div class="form-group">
+			         	<select class="form-control" name="attr">
+							<option value="movies">Movies</option>
+							<option value="actor" selected>Actor</option>					  
+						</select>
+			        </div>
+			    </div>
+			    <div class="col-lg-4">
+			        <div class="form-group">
+			          <input type="text" class="form-control" placeholder="Search" name="search_term">
+			        </div>
+			    </div>	        
+		        <button type="submit" class="btn btn-default">Submit</button>
+		    </div>
+		</form>
+	</div>  
+	<div class="recent-searches centered">
+	<h2><u>Recent Searches</u></h2>
+		<ul>
+		{% for search in recent_search %}
+			{% if search.attribute == 'actor'%}
+			<li><a href="{% url 'actorsearch' search.search_term %}">{{search.search_term | title}} ({{search.attribute | title}})</a></li>
+			{% else %}
+			<li><a href="{% url 'moviesearch' search.search_term %}">{{search.search_term | title}} ({{search.attribute | title}})</a></li>
+			{% endif %}
 		{% endfor %}
 		</ul>
 	</div>
+	
 </body>
 </html>

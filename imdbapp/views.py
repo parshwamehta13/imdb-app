@@ -5,11 +5,10 @@ from django.http import JsonResponse
 # Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
 from imdb import IMDb
 import json
 from django.shortcuts import render
+from models import Search
 import os
 import errno
 
@@ -18,12 +17,15 @@ def search_box(request):
 	if request.method == 'GET':
 		print request.GET['attr']
 		print request.GET['search_term']
+		recent_search = Search(search_term=request.GET['search_term'].replace(" ",""),attribute=request.GET['attr'])
+		recent_search.save()
+		print "Saved Successfully"
 		if request.GET['attr']=='movies':
-			search_movie = request.GET['search_term']
+			search_movie = request.GET['search_term'].replace(" ","")
 			#print '/movie_search/'+search_movie+'/'
 			return HttpResponseRedirect ('/moviesearch/'+search_movie+'/')
 		else:
-			search_actor = request.GET['search_term']
+			search_actor = request.GET['search_term'].replace(" ","")
 			return HttpResponseRedirect ('/actorsearch/'+search_actor+'/')
 
 def movie_search (request, search_movie):
@@ -34,7 +36,7 @@ def movie_search (request, search_movie):
 	for i in movie_list:
 		movie_info.append({'id':i.getID(),'name':i['title'],'kind':i['kind']})
 	print movie_list
-	return render(request, 'imdbapp/moviesearch.html', {'movie_list':movie_info})
+	return render(request, 'imdbapp/moviesearch.html', {'movie_list':movie_info,'search_term':search_movie})
 
 def actor_search (request, actor):
 	ia = IMDb()
@@ -43,7 +45,7 @@ def actor_search (request, actor):
 	for i in actor_list:
 		actor_info.append({'id':i.getID(),'name':i['name']})
 	print type(actor_info)
-	return render(request, 'imdbapp/actorsearch.html', {'actor_info':actor_info})
+	return render(request, 'imdbapp/actorsearch.html', {'actor_info':actor_info,'search_term':actor})
 
 def graph_json (request, id):
 	ia = IMDb()
@@ -81,7 +83,7 @@ def actor_specific (request,actor_id):
 	for i in actor['actor']:
 		movie_list.append({'id':i.getID(),'title':i['title']})
 		#movies_id.append(ia.get_movie(str(i.getID())))
-	actor_info = {'id':actor_id,'name':actor['name'],'birth_notes':actor['birth notes'],'birthday':actor['birth date'],'movies':movie_list}
+	actor_info = {'id':actor_id,'name':actor['name'],'birth_notes':actor['birth notes'],'birthday':actor['birth date'],'movies':movie_list,'image':actor['full-size headshot']}
 	#print actor_info
 	return render(request,'imdbapp/actor.html',{'actor_info':actor_info})
 
@@ -94,4 +96,10 @@ def movie_specific (request,movie_id):
 	movie_info = {'id':movie_id,'name':movie['title'],'rating':movie['rating'],'year':movie['year'],'cast':cast}
 	print movie_info
 	return render(request,'imdbapp/movie.html',{'movie':movie_info})
+
+def homepage (request):
+	ia = IMDb()
+	recent_search = Search.objects.all()[:5]
+
+	return render(request,'imdbapp/index.html',{'recent_search':recent_search})
 

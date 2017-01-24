@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^movie/(?P<movie_id>[0-9]+)/$', views.movie_specific,name='movie'),
     url(r'search/$',views.search_box,name='search_box'),
     url(r'^graph/(?P<id>[0-9]+)/$',views.graph_json,name='graph_json'),
+    url(r'^$',views.homepage,name='homepage')
 ]
