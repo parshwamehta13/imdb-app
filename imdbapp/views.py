@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
-
+from collections import defaultdict
+from django.http import JsonResponse
 # Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
@@ -9,10 +10,14 @@ from rest_framework.parsers import JSONParser
 from imdb import IMDb
 import json
 from django.shortcuts import render
+import os
+import errno
+
 
 def search_box(request):
 	if request.method == 'GET':
 		print request.GET['attr']
+		print request.GET['search_term']
 		if request.GET['attr']=='movies':
 			search_movie = request.GET['search_term']
 			#print '/movie_search/'+search_movie+'/'
@@ -40,16 +45,44 @@ def actor_search (request, actor):
 	print type(actor_info)
 	return render(request, 'imdbapp/actorsearch.html', {'actor_info':actor_info})
 
+def graph_json (request, id):
+	ia = IMDb()
+	leo = ia.get_person(str(id))
+	print leo
+	movies = leo['actor']
+	movies_id = []
+	for i in movies[:5]:
+		movies_id.append(ia.get_movie(str(i.getID())))
+	network = defaultdict(lambda:0)
+	for i in movies_id:
+		for j in i['cast'][:5]:
+			if j!=leo:
+				network[str(j)]+=1
+	json_data = {
+		"nodes":[],
+		"links":[]
+	}
+
+	json_data["nodes"].append({"name":leo['name'],"group":1})
+	for i in network:
+		json_data["nodes"].append({"name":i,"group":2})
+	count = 1
+	for i in network:
+		json_data["links"].append({"source":0,"target":count,"weight":network[i]})
+		count+=1
+	
+	return HttpResponse(JsonResponse(json_data))
 
 def actor_specific (request,actor_id):
 	ia = IMDb()
 	actor = ia.get_person(actor_id, info=['filmography'])
 	movie_list = []
+	#movies_id = []
 	for i in actor['actor']:
 		movie_list.append({'id':i.getID(),'title':i['title']})
+		#movies_id.append(ia.get_movie(str(i.getID())))
 	actor_info = {'id':actor_id,'name':actor['name'],'birth_notes':actor['birth notes'],'birthday':actor['birth date'],'movies':movie_list}
-	print actor_info
-	
+	#print actor_info
 	return render(request,'imdbapp/actor.html',{'actor_info':actor_info})
 
 def movie_specific (request,movie_id):

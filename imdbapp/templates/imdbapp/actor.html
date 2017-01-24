@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	
 	<title>{{actor_info.name}} IMDB Catalogue</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
@@ -8,10 +9,28 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<script src="http://d3js.org/d3.v2.min.js?2.9.3"></script>
+	<style>
 
+	.link {
+	  stroke: #aaa;
+	}
+
+	.node text {
+	stroke:#333;
+	cursos:pointer;
+	}
+
+	.node circle{
+	stroke:#fff;
+	stroke-width: 1px;
+	fill:#555;
+	}
+
+	</style>
 </head>
 <body>
-	<nav class="navbar navbar-default">
+	<nav class="navbar navbar-default container-fluid">
 	  <div class="container-fluid">
 	    <!-- Brand and toggle get grouped for better mobile display -->
 	    <div class="navbar-header">
@@ -31,7 +50,7 @@
 	        <li class="active"><a href="#">ACTORS</a></li>
 	        
 	      </ul>
-	      <form class="navbar-form navbar-left" >
+	      <form class="navbar-form navbar-left" method="GET" action="{% url 'search_box' %}">
 	      	<div class="form-group">
 	         	<select class="form-control" name="attr">
 					<option value="movies">Movies</option>
@@ -39,7 +58,7 @@
 				</select>
 	        </div>
 	        <div class="form-group">
-	          <input type="text" class="form-control" placeholder="Search" name="search_movie">
+	          <input type="text" class="form-control" placeholder="Search" name="search_term">
 	        </div>
 	        
 	        <button type="submit" class="btn btn-default">Submit</button>
@@ -47,19 +66,77 @@
 	    </div><!-- /.navbar-collapse -->
 	  </div><!-- /.container-fluid -->
 	</nav>
-	<div class="page-header">
-	  	<h1>{{actor_info.name}} <small>{{actor_info.id}}</small></h1>
+	<div class="data container">
+		<div class="page-header">
+		  	<h1>{{actor_info.name}} <small>{{actor_info.id}}</small></h1>
+		</div>
+		<div class="description">
+				
+			<p>{{actor_info.birth_notes}}</p>
+		</div>
+		<div class="movielist">
+			<ul class="list-group">
+			{% for movie in actor_info.movies %}
+				<li><a href="{% url 'movie' movie.id %}"> <b>{{ movie.title }}</b></a> (ID - {{ movie.id }})</li>
+			{% endfor %}
+			</ul>
+		</div>
 	</div>
-	<div class="description">
-			
-		<p>{{actor_info.birth_notes}}</p>
-	</div>
-	<div class="movielist">
-		<ul class="list-group">
-		{% for movie in actor_info.movies %}
-			<li><a href="{% url 'movie' movie.id %}"> <b>{{ movie.title }}</b></a> (ID - {{ movie.id }})</li>
-		{% endfor %}
-		</ul>
+	<h2 class="text-center">{{actor_info.name}} Network</h2>
+	<div class="graph">
 	</div>
 </body>
+<script type="text/javascript">
+	var width = 960,
+    height = 500
+
+var color = d3.scale.category10();
+
+var svg = d3.select(".graph").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var force = d3.layout.force()
+    .gravity(.05)
+    .distance(100)
+    .charge(-100)
+    .size([width, height]);
+
+d3.json("{% url 'graph_json' actor_info.id %}", function(json) {
+  force
+      .nodes(json.nodes)
+      .links(json.links)
+      .start();
+
+  var link = svg.selectAll(".link")
+      .data(json.links)
+    .enter().append("line")
+      .attr("class", "link")
+    .style("stroke-width", function(d) { return Math.sqrt(d.weight); });
+
+  var node = svg.selectAll(".node")
+      .data(json.nodes)
+    .enter().append("g")
+      .attr("class", "node")
+
+      .call(force.drag);
+
+  node.append("circle")
+      .attr("r","5");
+
+  node.append("text")
+      .attr("dx", 12)
+      .attr("dy", ".35em")
+      .text(function(d) { return d.name });
+
+  force.on("tick", function() {
+    link.attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+
+    node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+  });
+});
+</script>
 </html>

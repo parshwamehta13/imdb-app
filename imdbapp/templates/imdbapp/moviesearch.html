@@ -10,8 +10,8 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
 </head>
-<body>
-	<nav class="navbar navbar-default">
+<body >
+	<nav class="navbar navbar-default container-fluid">
 	  <div class="container-fluid">
 	    <!-- Brand and toggle get grouped for better mobile display -->
 	    <div class="navbar-header">
@@ -47,12 +47,14 @@
 	    </div><!-- /.navbar-collapse -->
 	  </div><!-- /.container-fluid -->
 	</nav>
-	<div class="movielist">
-		<ul class="list-group">
-		{% for movie in movie_list %}
-			<li><a href="{% url 'movie' movie.id %}"> <b>{{ movie.name }}</b></a> (ID - {{ movie.id }}) Type: {{ movie.kind }}</li>
-		{% endfor %}
-		</ul>
+	<div class="data container">
+		<div class="movielist">
+			<ul class="list-group">
+			{% for movie in movie_list %}
+				<li><a href="{% url 'movie' movie.id %}"> <b>{{ movie.name }}</b></a> (ID - {{ movie.id }}) Type: {{ movie.kind }}</li>
+			{% endfor %}
+			</ul>
+		</div>
 	</div>
 </body>
 </html>
