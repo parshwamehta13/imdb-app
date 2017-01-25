@@ -14,9 +14,12 @@ Technology Used:
 3. D3.js 
 
 Follow Ups:
-Display the actor network for the following people:
+Display the actor network for the following people from the local database:
 1. leo di caprio
 2. kevin bacon
 3. michael caine
 4. jhonny depp
 5. merol streep
+
+Feasiability For Folllow Up:
+The local database for the IMDB data is made and it is most likely that the task would be carried out successfully.
