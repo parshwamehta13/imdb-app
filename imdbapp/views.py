@@ -51,41 +51,52 @@ def graph_json (request, id):
 	ia = IMDb()
 	leo = ia.get_person(str(id))
 	print leo
-	movies = leo['actor']
-	movies_id = []
-	for i in movies[:5]:
-		movies_id.append(ia.get_movie(str(i.getID())))
-	network = defaultdict(lambda:0)
-	for i in movies_id:
-		for j in i['cast'][:5]:
-			if j!=leo:
-				network[str(j)]+=1
-	json_data = {
-		"nodes":[],
-		"links":[]
-	}
+	if leo.has_key('actor') or leo.has_key('actress'):
+		gender = 'actor' if leo.has_key('actor') else 'actress'
+		movies = leo['actor']
+		movies_id = []
+		for i in movies[:5]:
+			movies_id.append(ia.get_movie(str(i.getID())))
+		network = defaultdict(lambda:0)
+		for i in movies_id:
+			for j in i['cast'][:5]:
+				if j!=leo:
+					network[str(j)]+=1
+		json_data = {
+			"nodes":[],
+			"links":[]
+		}
 
-	json_data["nodes"].append({"name":leo['name'],"group":1})
-	for i in network:
-		json_data["nodes"].append({"name":i,"group":2})
-	count = 1
-	for i in network:
-		json_data["links"].append({"source":0,"target":count,"weight":network[i]})
-		count+=1
-	
-	return HttpResponse(JsonResponse(json_data))
+		json_data["nodes"].append({"name":leo['name'],"group":1})
+		for i in network:
+			json_data["nodes"].append({"name":i,"group":2})
+		count = 1
+		for i in network:
+			json_data["links"].append({"source":0,"target":count,"weight":network[i]})
+			count+=1
+		json_response = JsonResponse(json_data)
+		return HttpResponse(json_response)
+	else:
+		return HttpResponseRedirect("Actor Or Actress Data Missing")
 
 def actor_specific (request,actor_id):
 	ia = IMDb()
-	actor = ia.get_person(actor_id, info=['filmography'])
+	actor = ia.get_person(actor_id)
 	movie_list = []
-	#movies_id = []
-	for i in actor['actor']:
-		movie_list.append({'id':i.getID(),'title':i['title']})
-		#movies_id.append(ia.get_movie(str(i.getID())))
-	actor_info = {'id':actor_id,'name':actor['name'],'birth_notes':actor['birth notes'],'birthday':actor['birth date'],'movies':movie_list,'image':actor['full-size headshot']}
-	#print actor_info
-	return render(request,'imdbapp/actor.html',{'actor_info':actor_info})
+	if actor.has_key('actor') or actor.has_key('actress'):
+		gender = 'actor' if actor.has_key('actor') else 'actress'	
+		for i in actor[gender]:
+			movie_list.append({'id':i.getID(),'title':i['title']})
+
+		biography = actor['mini biography'] if actor.has_key('mini biography') else " "
+		birthday = actor['birth date'] if actor.has_key('birth date') else " "
+		image = actor['full-size headshot'] if actor.has_key('full-size headshot') else " "
+		birth_notes = actor['birth notes'] if actor.has_key('birth notes') else " "
+		actor_info = {'id':actor_id,'name':actor['name'],'birth_notes':birth_notes,'birthday':birthday,'movies':movie_list,'image':image,'biography':biography}
+		
+		return render(request,'imdbapp/actor.html',{'actor_info':actor_info})
+	else:
+		return HttpResponse("The particular actor details isn't present in the database \n Thank You")
 
 def movie_specific (request,movie_id):
 	ia = IMDb()

@@ -15,6 +15,11 @@
 	<link rel="stylesheet" type="text/css" href="{% static 'imdbapp/stylesheet.css' %}">
 	<style>
 
+	svg{
+		display: block;
+		margin: auto;
+	}
+
 	.link {
 	  stroke: #aaa;
 	}
@@ -65,50 +70,78 @@
 	  </div><!-- /.container-fluid -->
 	</nav>
 	<div class="data container">
-		<div class="row">
-			<div class="col-lg-5">
-				<div class="page-header ">
+		<div class="actor-header">
+			<h1>{{actor_info.name}} <small>{{actor_info.id}}</small></h1>
+		</div>
+		<div class="page-header ">
+			<div class="row">			
+				<div class="col-lg-5">
 					<div class="actor-image ">
-						<img class="img-rounded" src="{{actor_info.image}}" width="200" height="300">
-					</div>
-					<div class="actor-header">
-					  	<h1>{{actor_info.name}} <small>{{actor_info.id}}</small></h1>
+						<img class="img-rounded actor-image" src="{{actor_info.image}}" width="200" height="300">
 					</div>
 				</div>
-				
-				<div class="movielist">
-					<h2>Movies</h2>
-					{% for movie in actor_info.movies %}
-						<div class="well"><a href="{% url 'movie' movie.id %}"> <b>{{ movie.title }}</b></a> (ID - {{ movie.id }})</div>
-					{% endfor %}
+				<div class="col-lg-7">
 					
+					<div class="graph"></div>
 				</div>
-			</div>
-			<div class="col-lg-7">
-				<h2 class="text-center">{{actor_info.name}} Network</h2>
-				<div class="graph"></div>
 			</div>			
 		</div>
-	
+
+		<div class="actor-data">
+			{% if actor_info.birth_notes != " " %}
+			<div class="panel panel-default">
+			  	<div class="panel-heading">
+			    	<h3 class="panel-title"><b>Birth Notes</b></h3>
+			  	</div>
+			  	<div class="panel-body">
+			    	<p> <b>Place</b> - {{actor_info.birth_notes}}</p>
+			    	<p> <b>Birthday</b> - {{actor_info.birthday }}</p>
+			  	</div>
+			</div>
+			{% endif %}
+			{% if actor_info.biography != " " %}
+			<div class="panel panel-default">
+			  	<div class="panel-heading">
+			    	<h3 class="panel-title"><b>Biography</b></h3>
+			  	</div>
+			  	<div class="panel-body">
+			    	<p><span class="more_text">{{actor_info.biography}}</span></p>
+			  	</div>
+			</div>
+			{% endif %}
+
+			<div class="panel panel-default">
+			  	<div class="panel-heading">
+			    	<h3 class="panel-title"><b>Movies</b></h3>
+			  	</div>
+			  	<div class="panel-body">
+			  		<ul class="term-list">
+				  	{% for movie in actor_info.movies %}
+				    	<li class="term-item"><a href="{% url 'movie' movie.id %}"> <b>{{ movie.title }}</b></a> (ID - {{ movie.id }})</li>
+				  	{% endfor %}
+			  		<ul>
+			  	</div>
+			</div>
+		</div>
+	</div>
 </body>
 
 <script type="text/javascript">
 	var width = 960,
     height = 500
 
-var color = d3.scale.category10();
+	var color = d3.scale.category10();
 
-var svg = d3.select(".graph").append("svg")
-    .attr("width", width)
-    .attr("height", height);
+	var svg = d3.select(".graph").append("svg")
+	     	.attr("viewBox", "0 0 " + width + " " + height )
+	        .attr("preserveAspectRatio", "xMidYMid meet");
+	var force = d3.layout.force()
+	    .gravity(.05)
+	    .distance(100)
+	    .charge(-100)
+	    .size([width, height]);
 
-var force = d3.layout.force()
-    .gravity(.05)
-    .distance(100)
-    .charge(-100)
-    .size([width, height]);
-
-var color = d3.scale.category10();
+	var color = d3.scale.category10();
 
 d3.json("{% url 'graph_json' actor_info.id %}", function(json) {
   force
@@ -146,5 +179,68 @@ d3.json("{% url 'graph_json' actor_info.id %}", function(json) {
     node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
   });
 });
+</script>
+<script type="text/javascript">
+	$('ul.term-list').each(function(){
+  
+	  var LiN = $(this).find('li').length;
+	  
+	  if( LiN > 3){    
+	    $('li', this).eq(2).nextAll().hide().addClass('toggleable');
+	    $(this).append('<li class="more"><b>More ...</b></li>');    
+	  }
+	  
+	});
+
+
+	$('ul.term-list').on('click','.more', function(){
+	  
+	  if( $(this).hasClass('less') ){    
+	    $(this).text('More...').removeClass('less');    
+	  }else{
+	    $(this).text('Less...').addClass('less'); 
+	  }
+	  
+	  $(this).siblings('li.toggleable').slideToggle();
+	    
+	}); 
+</script>
+<script type="text/javascript">
+	$(document).ready(function() {
+	    // Configure/customize these variables.
+	    var showChar = 400;  // How many characters are shown by default
+	    var ellipsestext = ".....";
+	    var moretext = "Show more >";
+	    var lesstext = "Show less";
+	    
+
+	    $('.more_text').each(function() {
+	        var content = $(this).html();
+	 
+	        if(content.length > showChar) {
+	 
+	            var c = content.substr(0, showChar);
+	            var h = content.substr(showChar, content.length - showChar);
+	 
+	            var html = c + '<span class="moreellipses">' + ellipsestext+ '&nbsp;</span><span class="morecontent"><span>' + h + '</span>&nbsp;&nbsp;<a href="" class="morelink">' + moretext + '</a></span>';
+	 
+	            $(this).html(html);
+	        }
+	 
+	    });
+	 
+	    $(".morelink").click(function(){
+	        if($(this).hasClass("less")) {
+	            $(this).removeClass("less");
+	            $(this).html(moretext);
+	        } else {
+	            $(this).addClass("less");
+	            $(this).html(lesstext);
+	        }
+	        $(this).parent().prev().toggle();
+	        $(this).prev().toggle();
+	        return false;
+	    });
+	});
 </script>
 </html>

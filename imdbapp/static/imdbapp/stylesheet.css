@@ -12,3 +12,35 @@
 	font-size: 23px;
 }
 
+.actor-image{
+	display: block;
+	margin: auto;
+}
+
+.actor-header{
+	text-align: center;
+}
+
+.more{
+    color:#537AB7;
+    cursor:pointer;
+}
+
+li{
+	list-style-type: none;
+}
+
+ul{
+	padding-left: 0px;
+}
+
+.morecontent span {
+    display: none;
+}
+.morelink {
+    display: block;
+}
+
+.term-list{
+	font-size: 15px;
+}
