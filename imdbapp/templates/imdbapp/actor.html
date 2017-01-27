@@ -71,7 +71,7 @@
 	</nav>
 	<div class="data container">
 		<div class="actor-header">
-			<h1>{{actor_info.name}} <small>{{actor_info.id}}</small></h1>
+			<h1>{{actor_info.name}} <small>({{actor_info.id}})</small></h1>
 		</div>
 		<div class="page-header ">
 			<div class="row">			
@@ -116,7 +116,7 @@
 			  	</div>
 			  	<div class="panel-body">
 			  		<ul class="term-list">
-				  	{% for movie in actor_info.movies %}
+				  	{% for movie in actor_info.movie_list %}
 				    	<li class="term-item"><a href="{% url 'movie' movie.id %}"> <b>{{ movie.title }}</b></a> (ID - {{ movie.id }})</li>
 				  	{% endfor %}
 			  		<ul>

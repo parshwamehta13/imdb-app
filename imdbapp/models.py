@@ -16,3 +16,21 @@ class Search (models.Model):
 
 	class Meta:
 		ordering = ['-id']
+
+
+class Actor (models.Model):
+	id = models.CharField(primary_key=True,max_length=100)
+	name = models.CharField(max_length=100)
+	gender = models.CharField(max_length=20)
+	biography = models.TextField()
+	image = models.URLField()
+	birth_notes = models.TextField()
+	movie_list = models.TextField()
+
+	def __unicode__(self):
+		return self.name
+
+class Actor_Graph (models.Model):
+	id = models.CharField(primary_key=True,max_length=100)
+	json_data = models.TextField()
+
