@@ -133,8 +133,19 @@
 	var color = d3.scale.category10();
 
 	var svg = d3.select(".graph").append("svg")
+			.attr({"width":"100%","height":"100%"})
 	     	.attr("viewBox", "0 0 " + width + " " + height )
-	        .attr("preserveAspectRatio", "xMidYMid meet");
+	        .attr("preserveAspectRatio", "xMidYMid meet")
+	        .attr("pointer-events", "all")
+    		.call(d3.behavior.zoom().on("zoom", redraw));	
+
+
+    function redraw() {
+	  svg.attr("transform",
+	      "translate(" + d3.event.translate + ")"
+	      + " scale(" + d3.event.scale + ")");
+	}
+
 	var force = d3.layout.force()
 	    .gravity(.05)
 	    .distance(100)

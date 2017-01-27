@@ -46,22 +46,67 @@
 	  </div><!-- /.container-fluid -->
 	</nav>
 	<div class="data container">
-		<div class="page-header">
-		  	<h1>{{movie.name}} ({{movie.year}})<small>{{movie.id}}</small></h1>
+		<div class="actor-header">
+			<h1>{{movie.name}} <small>({{movie.id}})</small> <small>{{movie.year}}</small></h1>
 		</div>
-		<div class="description">			
-			<p><b>Rating {{movie.rating}}/10</b></p>
+		<div class="page-header ">
+			<div class="row">			
+				<div class="col-lg-12">
+					<div class="actor-image ">
+						<img class="img-rounded actor-image" src="{{movie.image}}" width="200" height="300">
+					</div>
+				</div>
+			</div>			
+		</div>
 
+		<div class="actor-data">
+			<div class="panel panel-default">
+			  	<div class="panel-heading">
+			    	<h3 class="panel-title"><b>Rating</b></h3>
+			  	</div>
+			  	<div class="panel-body">
+			  		<p>{{movie.rating}}</p>
+			  	</div>
+			</div>
 		</div>
-		<div class="castlist">
-			<ul class="list-group">
-			<h3>Starring</h3>
-			{% for cast in movie.cast %}
-				<li><a href="{% url 'actor' cast.id %}"> <b>{{ cast.name }}</b></a> ID - {{ cast.id }}</li>
-			{% endfor %}
-			</ul>
+		{% if movie.genre != " " %}
+		<div class="actor-data">
+			<div class="panel panel-default">
+			  	<div class="panel-heading">
+			    	<h3 class="panel-title"><b>Genre</b></h3>
+			  	</div>
+			  	<div class="panel-body">
+			  		<p>{{movie.genre}}</p>
+			  	</div>
+			</div>
+		</div>
+		{% endif %}
+		{% if movie.plot != " " %}
+		<div class="actor-data">
+			<div class="panel panel-default">
+			  	<div class="panel-heading">
+			    	<h3 class="panel-title"><b>Plot Summary</b></h3>
+			  	</div>
+			  	<div class="panel-body">
+			  		<p>{{movie.plot}}</p>
+			  	</div>
+			</div>
+		</div>
+		{% endif %}
+		<div class="actor-data">
+			<div class="panel panel-default">
+			  	<div class="panel-heading">
+			    	<h3 class="panel-title"><b>Cast</b></h3>
+			  	</div>
+			  	<div class="panel-body">
+			  		<ul class="term-list">
+				  	{% for cast in movie.cast %}
+				    	<li class="term-item"><a href="{% url 'actor' cast.id %}"> <b>{{ cast.name }}</b></a> (ID - {{ cast.id }})</li>
+				  	{% endfor %}
+			  		<ul>
+			  	</div>
+			</div>
 		</div>
 	</div>
-
 </body>
 </html>

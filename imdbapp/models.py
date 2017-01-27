@@ -26,6 +26,7 @@ class Actor (models.Model):
 	image = models.URLField()
 	birth_notes = models.TextField()
 	movie_list = models.TextField()
+	birthday = models.CharField(max_length=100,default="1st January 1990")
 
 	def __unicode__(self):
 		return self.name
